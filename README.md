@@ -1,61 +1,195 @@
------------------------------------
+# raylib game template
 
-_DISCLAIMER:_
+A base structure for developing games with [raylib](https://www.raylib.com) in C.
 
-Welcome to **raylib game template**!
+## New to C Programming? Start Here!
 
-This template provides a base structure to start developing a small raylib game in plain C. The repo is also pre-configured with a default `LICENSE` (zlib/libpng) and a `README.md` (this one) to be properly filled by users. Feel free to change the LICENSE as required.
+Don't worry if you've never programmed in C before. This template is a great way to learn! Here's everything you need to know.
 
-All the sections defined by `$(Data to Fill)` are expected to be edited and filled properly. It's recommended to delete this disclaimer message after editing this `README.md` file.
+### What You'll Need
 
-This template has been created to be used with raylib (www.raylib.com) and it's licensed under an unmodified zlib/libpng license.
+1. **A code editor** - [VS Code](https://code.visualstudio.com/) is free and beginner-friendly
+2. **A C compiler** - This turns your code into a runnable program
+3. **CMake** - A tool that helps build your project
 
-_Copyright (c) 2014-2025 Ramon Santamaria ([@raysan5](https://github.com/raysan5))_
+### Step 1: Install the Tools
 
------------------------------------
-## Getting Started with this template
+#### Windows
+1. Download and install [Visual Studio 2022 Community](https://visualstudio.microsoft.com/) (free)
+   - During installation, select "Desktop development with C++"
+   - This includes the compiler and CMake
+2. Alternatively, install [w64devkit](https://github.com/skeeto/w64devkit/releases) for a lighter setup
 
-#### Linux
-When setting up this template on linux for the first time, install the dependencies from this page:
-([Working on GNU Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux))
+#### macOS
+1. Open Terminal and run:
+   ```bash
+   xcode-select --install
+   brew install cmake
+   ```
 
-You can use this templates in a few ways: using Visual Studio, using CMake, or make your own build setup. This repository comes with Visual Studio and CMake already set up.
+#### Linux (Ubuntu/Debian)
+```bash
+sudo apt update
+sudo apt install build-essential cmake git
+sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+```
 
-Chose one of the follow setup options that fit in you development environment.
+### Step 2: Build and Run
 
-### Visual Studio
+Open a terminal/command prompt in the project folder and run:
 
-- After extracting the zip, the parent folder `raylib-game-template` should exist in the same directory as `raylib` itself.  So, your file structure should look like this:
-    - Some parent directory
-        - `raylib`
-            - the contents of https://github.com/raysan5/raylib
-        - `raylib-game-template`
-            - this `README.md` and all other raylib-game-template files
-- If using Visual Studio, open projects/VS2022/raylib-game-template.sln
-- Select on `raylib_game` in the solution explorer, then in the toolbar at the top, click `Project` > `Set as Startup Project`
-- Now you're all set up!  Click `Local Windows Debugger` with the green play arrow and the project will run.
+```bash
+# Configure the project (downloads raylib automatically)
+cmake -S . -B build
+
+# Build the game
+cmake --build build
+
+# Run the game (from the src folder so resources load correctly)
+cd src
+```
+
+Then run the executable:
+- **Windows:** `..\build\raylib-game-template\Debug\raylib-game-template.exe`
+- **macOS/Linux:** `../build/raylib-game-template/raylib-game-template`
+
+You should see a window with the raylib logo that transitions to a title screen!
+
+### Step 3: Understanding the Code Structure
+
+```
+src/
+├── raylib_game.c      # Main file - game loop lives here
+├── screens.h          # Shared definitions for all screens
+├── screen_logo.c      # Logo/splash screen
+├── screen_title.c     # Title/menu screen
+├── screen_gameplay.c  # YOUR GAME CODE GOES HERE!
+├── screen_options.c   # Options/settings screen
+├── screen_ending.c    # Game over/ending screen
+└── resources/         # Images, sounds, fonts
+```
+
+**The game flows like this:** Logo → Title → Gameplay → Ending → Title (loop)
+
+### Step 4: Make Your First Change
+
+Let's modify the gameplay screen! Open `src/screen_gameplay.c` and find the `DrawGameplayScreen` function:
+
+```c
+void DrawGameplayScreen(void)
+{
+    // Change the background color
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), PURPLE);
+
+    // Draw some text
+    DrawText("MY FIRST GAME!", 20, 20, 40, WHITE);
+
+    // Draw a moving circle (add these lines)
+    static float x = 400;  // static means it remembers its value
+    static float y = 225;
+
+    // Move with arrow keys
+    if (IsKeyDown(KEY_RIGHT)) x += 5;
+    if (IsKeyDown(KEY_LEFT)) x -= 5;
+    if (IsKeyDown(KEY_DOWN)) y += 5;
+    if (IsKeyDown(KEY_UP)) y -= 5;
+
+    DrawCircle(x, y, 30, YELLOW);
+}
+```
+
+Rebuild and run to see your changes!
+
+### Step 5: Learn C as You Go
+
+Here are the C basics you'll use most:
+
+```c
+// Variables - store data
+int score = 0;              // Whole numbers
+float speed = 5.5f;         // Decimal numbers (f means float)
+bool isAlive = true;        // true or false
+
+// If statements - make decisions
+if (score > 100) {
+    // do something
+}
+
+// Loops - repeat actions
+for (int i = 0; i < 10; i++) {
+    // runs 10 times
+}
+
+// Functions - reusable code blocks
+void MyFunction(int parameter) {
+    // code here
+}
+```
+
+### Useful raylib Functions for Beginners
+
+```c
+// Drawing
+DrawRectangle(x, y, width, height, color);
+DrawCircle(x, y, radius, color);
+DrawText("Hello", x, y, fontSize, color);
+
+// Input
+IsKeyPressed(KEY_SPACE);    // True once when pressed
+IsKeyDown(KEY_SPACE);       // True while held down
+GetMousePosition();         // Returns Vector2 with x, y
+
+// Collision detection
+CheckCollisionRecs(rect1, rect2);      // Rectangle vs rectangle
+CheckCollisionCircles(c1, r1, c2, r2); // Circle vs circle
+
+// Sound (fxCoin is already loaded for you!)
+PlaySound(fxCoin);
+
+// Random numbers
+GetRandomValue(min, max);
+```
+
+### Common Beginner Mistakes
+
+1. **Forgetting semicolons** - Every statement ends with `;`
+2. **Using `=` instead of `==`** - Use `=` to assign, `==` to compare
+3. **Not rebuilding** - After changing code, run `cmake --build build` again
+4. **Resources not loading** - Make sure to run from the `src` folder
+
+### Where to Learn More
+
+- [raylib cheatsheet](https://www.raylib.com/cheatsheet/cheatsheet.html) - All functions at a glance
+- [raylib examples](https://www.raylib.com/examples.html) - 100+ code examples
+- [Learn C](https://www.learn-c.org/) - Interactive C tutorial
+
+---
+
+## Getting Started (Experienced Developers)
 
 ### CMake
 
-- Extract the zip of this project
-- Type the follow command:
-
-```sh
+```bash
 cmake -S . -B build
-```
-
-> if you want to configure your project to build with debug symbols, use the flag `-DCMAKE_BUILD_TYPE=Debug`
-
-- After CMake configures your project, build with:
-
-```sh
 cmake --build build
 ```
 
-- Inside the build folder is another folder (named the same as the project name on CMakeLists.txt) with the executable and resources folder.
-- In order for resources to load properly, cd to `src` and run the executable (`../build/${PROJECT_NAME}/${PROJECT_NAME}`) from there.
+Run from `src` directory for proper resource loading. Debug build: `-DCMAKE_BUILD_TYPE=Debug`
 
-- cmake will automatically download a current release of raylib but if you want to use your local version you can pass `-DFETCHCONTENT_SOURCE_DIR_RAYLIB=<dir_with_raylib>` 
+CMake automatically fetches raylib 5.5. Use local raylib: `-DFETCHCONTENT_SOURCE_DIR_RAYLIB=<path>`
+
+### Visual Studio
+
+1. Place `raylib-game-template` alongside a `raylib` folder
+2. Open `projects/VS2022/raylib-game-template.sln`
+3. Set `raylib_game` as startup project
+4. Click "Local Windows Debugger" to run
+
+### Linux Dependencies
+
+See [Working on GNU Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
+
+---
 
 ## $(Game Title)
 
@@ -80,24 +214,19 @@ Keyboard:
 
 ### Screenshots
 
-_TODO: Show your game to the world, animated GIFs recommended!._
+_TODO: Show your game to the world, animated GIFs recommended!_
 
 ### Developers
 
  - $(Developer 01) - $(Role/Tasks Developed)
- - $(Developer 02) - $(Role/Tasks Developed)
- - $(Developer 03) - $(Role/Tasks Developed)
 
 ### Links
 
  - YouTube Gameplay: $(YouTube Link)
  - itch.io Release: $(itch.io Game Page)
- - Steam Release: $(Steam Game Page)
 
 ### License
 
 This game sources are licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
 
-$(Additional Licenses)
-
-*Copyright (c) $(Year) $(User Name) ($(User Twitter/GitHub Name))*
+*Copyright (c) 2014-2025 Ramon Santamaria ([@raysan5](https://github.com/raysan5))*
